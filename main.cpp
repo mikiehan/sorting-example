@@ -64,7 +64,7 @@ void insertionSort(vector<int>& list) {
 // Pre-condition: list[s1:e1] (left) and list[s2:e2] (right) are sorted
 // Note: s1, e1, s2, e2 are inclusive and are valid indices
 // Merges the left and the right into a sorted result[s1:e2].
-void merge(vector<int>& list, vector<int>& result, int s1, int e1, int s2, int e2) {
+void merge(const vector<int>& list, vector<int>& result, int s1, int e1, int s2, int e2) {
     int i1 = s1;   // index of left array
     int i2 = s2;   // index of right array
     for (int i = s1; i <= e2; i++) {
@@ -99,13 +99,50 @@ void mergeSort(vector<int>& list){
     mergeSort(copy, list, 0, (int) list.size() - 1);
 }
 
+//a version of merge (used for mergeSort2)
+//merges two separate halves (left and right) into list
+//pre-condition: 1) left and right is sorted
+//               2) size of list is equal to size of left + size of right
+void merge2(vector<int>& list, const vector<int> left, const vector<int> right){
+    int i1 = 0; //left index
+    int i2 = 0; //right index
+    for(int i = 0 ; i < list.size(); i++){
+        if(i1 < left.size() &&
+           (i2 >= right.size() || left[i1] <= right[i2])) {
+            list[i] = left[i1++]; //take from left
+        } else {
+            list[i] = right[i2++]; //take from right
+        }
+    }
+}
+
+//sub-optimal merge sort uses O(n log n) space
+void mergeSort2(vector<int>& list){
+    if(list.size() <= 1) return; //base case
+    
+    // copy list into two halves (left and right)
+    vector<int> left(list.size()/2);
+    vector<int> right(list.size() - left.size());
+    std::copy(list.begin(), list.begin() + left.size() ,left.begin());
+    std::copy(list.begin() + left.size(), list.end(), right.begin());
+    
+    // sort the two halves
+    mergeSort2(left);
+    mergeSort2(right);
+    
+    // merge the sorted havles into list
+    merge2(list, left, right);
+}
+
 int main(int argc, const char * argv[]) {
     int numbers[10] = {22, 12, 30, 27, 18, 50, 36, -7, -4, 25};
     vector<int> list(10);
-    copy(numbers, numbers + 10, list.begin());
-    selectionSort(list);
+    std::copy(numbers, numbers + 10, list.begin());
+    //selectionSort(list);
     //bubbleSort(list);
     //insertionSort(list);
-    //mergeSort(list);
+    mergeSort(list);
     return 0;
 }
+
+
